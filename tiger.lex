@@ -1,12 +1,12 @@
 %{
 #include <string.h>
-#include "util.h"
-#include "tokens.h"
-#include "errormsg.h"
+#include "parser.hpp"
 
 int charPos=1;
 
-int yywrap(void)
+extern void yyerror(char *);
+
+extern "C" int yywrap(void)
 {
  charPos=1;
  return 1;
@@ -15,7 +15,7 @@ int yywrap(void)
 
 void adjust(void)
 {
- EM_tokPos=charPos;
+ /* EM_tokPos=charPos; */
  charPos+=yyleng;
 }
 
@@ -24,8 +24,8 @@ void adjust(void)
 %%
 " "	 {adjust(); continue;}
 \t	 {adjust(); continue;}
-\n	 {adjust(); EM_newline(); continue;}
-","	 {adjust(); return COMMA;}
+\n	 {adjust(); /* EM_newline(); */ continue;}
+","  {adjust(); return COMMA;}
 ":"  {adjust(); return COLON;}
 ";"  {adjust(); return SEMICOLON;}
 "("  {adjust(); return LPAREN;}
@@ -67,5 +67,5 @@ var   {adjust(); return VAR;}
 type  {adjust(); return TYPE;}
 [0-9]+	 {adjust(); yylval.ival=atoi(yytext); return INT;}
 [a-zA-Z][0-9a-zA-Z_]* {adjust(); yylval.sval=yytext; return ID;}
-.	 {adjust(); EM_error(EM_tokPos,"illegal token");}
+.	 {adjust(); yyerror(/*EM_tokPos,*/"illegal token");}
 
