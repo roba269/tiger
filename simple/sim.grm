@@ -1,0 +1,29 @@
+%{
+  #include <cstdio>
+
+  extern int yylex();
+  void yyerror(const char *s) {
+    printf("ERROR: %s\n", s);
+  }
+%}
+
+%union {
+  int val;
+}
+
+%token <val> INT
+%token PLUS MINUS
+
+%left PLUS MINUS
+
+%start prog
+%%
+
+prog : exp
+exp : INT
+    | INT PLUS INT
+    | INT MINUS INT
+    ;
+
+%%
+

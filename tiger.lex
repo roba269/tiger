@@ -3,6 +3,7 @@
 #include "parser.hpp"
 
 int charPos=1;
+int EM_tokPos;
 
 extern void yyerror(char *);
 
@@ -15,7 +16,7 @@ extern "C" int yywrap(void)
 
 void adjust(void)
 {
- /* EM_tokPos=charPos; */
+ EM_tokPos=charPos;
  charPos+=yyleng;
 }
 
@@ -67,5 +68,5 @@ var   {adjust(); return VAR;}
 type  {adjust(); return TYPE;}
 [0-9]+	 {adjust(); yylval.ival=atoi(yytext); return INT;}
 [a-zA-Z][0-9a-zA-Z_]* {adjust(); yylval.sval=yytext; return ID;}
-.	 {adjust(); yyerror(/*EM_tokPos,*/"illegal token");}
+.	 {adjust(); yyerror("illegal token");}
 

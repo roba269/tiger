@@ -1,12 +1,15 @@
 %{
 #include <stdio.h>
+#include "ast_node.h"
 
 extern int yylex(void); /* function prototype */
+extern int EM_tokPos;
+extern struct Exp* root;
 
 void yyerror(char *s)
 {
  // EM_error(EM_tokPos, "%s", s);
-  printf("ERROR: %s\n", s); 
+  printf("ERROR: position:%d %s\n", EM_tokPos, s); 
 }
 %}
 
@@ -14,14 +17,16 @@ void yyerror(char *s)
 %union {
 	int pos;
 	int ival;
-	char* sval;
-  int token;
+  char* sval;
+  int token_;
+  struct Exp *exp;
 }
 
 %token <sval> ID STRING
-%token <ival> INT
 
 %token <token> COMMA COLON SEMICOLON LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN ARRAY IF THEN ELSE WHILE FOR TO DO LET IN END OF BREAK NIL FUNCTION VAR TYPE 
+%token <exp> INT
+%type <exp> program exp
 
 %start program
 
@@ -30,7 +35,7 @@ void yyerror(char *s)
 %left UMINUS
 %%
 
-program: exp
+program: exp            {root = $1;}
 /*
 exp: INT {}
    | exp PLUS exp {}
@@ -38,14 +43,14 @@ exp: INT {}
    ;
 */
 exp: lvalue
-   | INT
+   | INT                {$$ = new IntExp(yylval.ival);}
    | STRING
    | NIL
    | LPAREN exp RPAREN
-   | exp PLUS exp
-   | exp MINUS exp
-   | exp TIMES exp
-   | exp DIVIDE exp
+   | exp PLUS exp       {$$ = new OpExp(PlusOp, $1, $3);}
+   | exp MINUS exp      {$$ = new OpExp(MinusOp, $1, $3);}
+   | exp TIMES exp      {$$ = new OpExp(TimesOp, $1, $3);}
+   | exp DIVIDE exp     {$$ = new OpExp(DivideOp, $1, $3);} 
    | exp AND exp
    | exp OR exp
    | exp EQ exp

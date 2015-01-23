@@ -1,3 +1,7 @@
 *.o
 *.a
 *.out
+lex.yy.*
+parser.cpp
+parser.hpp
+parser.output

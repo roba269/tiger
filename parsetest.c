@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "ast_node.h"
 
 extern int yyparse(void);
 extern FILE* yyin;
+Exp *root;
 
 void parse(const char* fname) 
 {/*EM_reset(fname);*/
@@ -20,5 +22,6 @@ void parse(const char* fname)
 int main(int argc, char **argv) {
  if (argc!=2) {fprintf(stderr,"usage: a.out filename\n"); exit(1);}
  parse(argv[1]);
+ printf("The final result is: %d\n", root->eval());
  return 0;
 }
